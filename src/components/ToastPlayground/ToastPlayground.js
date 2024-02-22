@@ -7,26 +7,42 @@ const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 
 function ToastPlayground() {
 
+  const [toastStack, setToastStack] = useState([]);
   const [variant, setVariant] = useState(VARIANT_OPTIONS[0]);
   const [message, setMessage] = useState('');
-  const [toastStack, setToastStack] = useState([]);
+
+  function handleCreateToast (event) {
+    event.preventDefault();
+
+    setToastStack((prevToastStack) => [
+      ...prevToastStack,
+      { id: crypto.randomUUID(), variant: variant, message: message }
+    ]);
+
+    setVariant(VARIANT_OPTIONS[0]);
+    setMessage('');
+  }
+
+  function handleDismiss (id) {
+    setToastStack((prevToastStack) => (
+      prevToastStack.filter(toast =>  toast.id !== id)
+    ));
+  }
 
   return (
     <form
       className={styles.wrapper}
-      onSubmit={(event) => {
-        event.preventDefault();
-        setToastStack((prevToastStack) => [...prevToastStack, { variant: variant, message: message }]);
-        setVariant(VARIANT_OPTIONS[0]);
-        setMessage('');
-      }}
+      onSubmit={handleCreateToast}
     >
       <header>
         <img alt="Cute toast mascot" src="/toast.png" />
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toastStack={toastStack} />
+      <ToastShelf
+        toastStack={toastStack}
+        handleDismiss={handleDismiss}
+      />
 
       <div className={styles.controlsWrapper}>
         <div className={styles.row}>
@@ -73,7 +89,7 @@ function ToastPlayground() {
           <div
             className={`${styles.inputWrapper} ${styles.radioWrapper}`}
           >
-            <Button type='submit'>Pop Toast!</Button>
+            <Button type='submit' onClick={event => event.stopPropagation()}>Pop Toast!</Button>
           </div>
         </div>
       </div>

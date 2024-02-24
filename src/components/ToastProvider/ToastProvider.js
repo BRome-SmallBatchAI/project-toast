@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export const ToastContext = React.createContext();
 
@@ -18,6 +18,20 @@ function ToastProvider({ children }) {
       prevToastStack.filter(toast =>  toast.id !== id)
     ));
   }
+
+  useEffect(() => { // clear all toasts on Escape Key pressed
+    function handleEscKeyDown(event) {
+      if (event.code === 'Escape') {
+        setToastStack([]);
+      }
+    }
+
+    window.addEventListener('keydown', handleEscKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleEscKeyDown);
+    };
+  },[]);
 
   return (
     <ToastContext.Provider

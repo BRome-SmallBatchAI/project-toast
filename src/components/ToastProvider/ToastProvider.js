@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import useEscapeKey from '../../hooks/useKeydown';
 
 export const ToastContext = React.createContext();
 
@@ -19,19 +20,13 @@ function ToastProvider({ children }) {
     ));
   }
 
-  useEffect(() => { // clear all toasts on Escape Key pressed
-    function handleEscKeyDown(event) {
-      if (event.code === 'Escape') {
-        setToastStack([]);
-      }
-    }
-
-    window.addEventListener('keydown', handleEscKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleEscKeyDown);
-    };
+  const handleEscape = useCallback(() => {
+    setToastStack([]);
   },[]);
+
+  // Use Custom Hook
+  useEscapeKey('Escape', handleEscape);
+
 
   return (
     <ToastContext.Provider
